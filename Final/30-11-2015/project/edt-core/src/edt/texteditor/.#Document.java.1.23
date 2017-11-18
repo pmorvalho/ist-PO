@@ -1,0 +1,96 @@
+package edt.texteditor;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+
+import java.io.Serializable;
+
+
+public class Document extends Section implements Serializable {
+
+/*==============================================================================
+ *	Attributes
+ *============================================================================*/
+	private TreeMap<String,TextElement> _elements = new TreeMap<String,TextElement>();
+	private TreeMap<String,Author> _authors = new TreeMap<String,Author>();
+	private String _filename = "";
+
+/*==============================================================================
+ *	Getters and Setters
+ *============================================================================*/
+	public String getFilename(){
+		return _filename;
+	}
+
+	public void setFilename(String filename){
+		_filename = filename;
+	}
+
+	public TreeMap<String,Author> getAuthors()	{	
+		return _authors;			
+	}
+
+/*==============================================================================
+ *	Author methods
+ *============================================================================*/
+	public List<Author> getAuthorsData(){
+		List<Author> authorsdata = new ArrayList<Author>(_authors.values());
+		return authorsdata;
+	}
+
+	public boolean addAuthor(String name, String email){
+		if(_authors.containsKey(name)){
+			return false;
+		}
+		else{
+			_authors.put(name,new Author(name,email));
+			return true;	
+		}	
+	}
+ 
+/*==============================================================================
+ *	TextElement methods
+ *============================================================================*/
+ 	public void addTextElement(TextElement element){
+ 		_elements.put(element.getId(),element);
+ 	}
+
+ 	public void removeTextElement(String id){
+ 		if(_elements.containsKey(id)){
+ 			_elements.get(id).setId("");
+ 			_elements.remove(id);
+ 		}
+ 	}
+ 	
+ 	public void removeTextElements(ArrayList<String> removedIds){
+	    int i;
+	    String id;
+	    for(i=removedIds.size(); i<0; i--){
+	      id=removedIds.remove(i);
+	      if (hasTextElement(id)){
+	      removeTextElement(id);
+	      }
+	    }
+	 }   
+
+ 	public boolean hasTextElement(String id){
+ 		return _elements.containsKey(id);
+ 	}
+
+ 	public TextElement getTextElement(String id){
+ 		return _elements.get(id);
+ 	}
+ 	
+/*==============================================================================
+ *	Document methods
+ *============================================================================*/
+ 	public int getIdentifiers(){
+ 		return _elements.size();
+ 	}
+ 	
+ 	public void accept(Visitor v){
+ 		v.visitDocument(this);
+ 	}
+}
